@@ -1,33 +1,44 @@
 import React, { useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
-export default function ReceiptUploader() {
+export default function ReceiptParser() {
   const [items, setItems] = useState([]);
   const [total, setTotal] = useState(0);
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
+  const sampleReceipt = `
+    ----------------------------------------------------
+             Grocery Store Receipt
+    ----------------------------------------------------
+    Date: 2024-12-31
+    Transaction ID: 123456791
 
-    if (!file) return;
+    Items Purchased:
+    1. Yogurt - $2.50
+    2. Peach - $1.20
+    3. Water - $3.00
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const text = e.target.result;
-      parseReceipt(text);
-    };
-    reader.readAsText(file);
-  };
+    Subtotal: $6.70
+    Tax (5%): $0.34
+    Total: $7.04
 
-  const parseReceipt = (receiptText) => {
+    Thank you for shopping with us!
+    ----------------------------------------------------
+    Store Address:
+    1234 Main Street, Anytown, USA
+    Phone: (123) 456-7890
+    ----------------------------------------------------
+  `;
+
+  const parseReceipt = () => {
     const itemRegex = /\d+\.\s(.+?)\s-\s\$(\d+\.\d+)/g;
     let match;
     const extractedItems = [];
 
-    while ((match = itemRegex.exec(receiptText)) !== null) {
+    while ((match = itemRegex.exec(sampleReceipt)) !== null) {
       extractedItems.push({ name: match[1], price: parseFloat(match[2]) });
     }
 
-    const totalMatch = receiptText.match(/Total:\s\$(\d+\.\d+)/);
+    const totalMatch = sampleReceipt.match(/Total:\s\$(\d+\.\d+)/);
     const extractedTotal = totalMatch ? parseFloat(totalMatch[1]) : 0;
 
     setItems(extractedItems);
@@ -36,13 +47,13 @@ export default function ReceiptUploader() {
 
   return (
     <div className="p-4 max-w-lg mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Upload Receipt</h2>
-      <input
-        type="file"
-        accept=".txt"
-        onChange={handleFileUpload}
-        className="mb-4 border p-2"
-      />
+      <h2 className="text-2xl font-bold mb-4">Receipt Parser</h2>
+      <button
+        onClick={parseReceipt}
+        className="px-4 py-2 bg-blue-600 text-white rounded"
+      >
+        Extract Data
+      </button>
 
       {items.length > 0 && (
         <>
